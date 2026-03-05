@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="js/vue.js" defer></script>
     <script src="js/main.js" defer></script>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/main.css">
     <title>Заметочки</title>
 </head>
 <body>
@@ -14,15 +14,45 @@
     <div class="columns">
         <div class="column">
             <h2>Новое</h2>
-            <div class="cards"></div>
+            <button @click="addCard" :disabled="col1.length >= maxCol1">Добавить карточку</button>
+            <div class="cards">
+                <div v-for="card in col1" :key="card.id" class="card">
+                    <input v-model="card.title" placeholder="Заголовок">
+                    <div class="items">
+                        <div v-for="item in card.items" :key="item.id" class="item">
+                            <input v-model="item.text" placeholder="Пункт">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="column">
             <h2>В процессе</h2>
-            <div class="cards"></div>
+            <div class="cards">
+                <div v-for="card in col2" :key="card.id" class="card">
+                    <input v-model="card.title" placeholder="Заголовок">
+                    <div class="items">
+                        <div v-for="item in card.items" :key="item.id" class="item">
+                            <input v-model="item.text" placeholder="Пункт">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="column">
             <h2>Завершено</h2>
-            <div class="cards"></div>
+            <div class="cards">
+                <div v-for="card in col3" :key="card.id" class="card">
+                    <input v-model="card.title" placeholder="Заголовок">
+                    <div class="items">
+                        <div v-for="item in card.items" :key="item.id" class="item">
+                            <input v-model="item.text" placeholder="Пункт">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

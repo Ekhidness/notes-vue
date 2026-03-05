@@ -6,3 +6,4 @@ body { font-family: sans-serif; margin: 20px; }
 .item input[type="text"] { flex: 1; }
 button { cursor: pointer; }
 button:disabled { opacity: 0.5; }
+h2 { text-align: center}
