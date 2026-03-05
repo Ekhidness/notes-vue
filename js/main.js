@@ -49,6 +49,7 @@ new Vue({
 
             if (percentage === 100) {
                 if (currentCol === 'col1' || currentCol === 'col2') {
+                    card.completedDate = new Date().toLocaleString();
                     this.moveCard(card, currentCol, 'col3');
                     if (currentCol === 'col2') this.processQueueFromCol1();
                 }
@@ -67,7 +68,8 @@ new Vue({
                     { id: this.nextId++, text: '', completed: false },
                     { id: this.nextId++, text: '', completed: false },
                     { id: this.nextId++, text: '', completed: false }
-                ]
+                ],
+                completedDate: null
             };
             this.col1.push(newCard);
         },

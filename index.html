@@ -50,14 +50,12 @@
         <div class="column">
             <h2>Завершено</h2>
             <div class="cards">
-                <div v-for="card in col3" :key="card.id" class="card">
-                    <input v-model="card.title" placeholder="Заголовок" readonly>
-                    <div class="items">
-                        <div v-for="item in card.items" :key="item.id" class="item">
-                            <input type="checkbox" v-model="item.completed" @change="onItemToggle(card)">
-                            <input v-model="item.text" placeholder="Пункт" readonly>
-                        </div>
-                    </div>
+                <div v-for="card in col3" :key="card.id" class="card completed">
+                    <h3>{{ card.title }}</h3>
+                    <ul>
+                        <li v-for="item in card.items" :key="item.id">{{ item.text }}</li>
+                    </ul>
+                    <div class="completed-date">{{ card.completedDate }}</div>
                 </div>
             </div>
         </div>
