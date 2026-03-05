@@ -15,6 +15,14 @@ new Vue({
             );
         }
     },
+    watch: {
+        col1: { handler: 'saveToLocalStorage', deep: true },
+        col2: { handler: 'saveToLocalStorage', deep: true },
+        col3: { handler: 'saveToLocalStorage', deep: true }
+    },
+    mounted() {
+        this.loadFromLocalStorage();
+    },
     methods: {
         getCompletionPercentage(card) {
             if (!card.items.length) return 0;
@@ -82,6 +90,25 @@ new Vue({
             if (card.items.length > 3) {
                 const index = card.items.findIndex(i => i.id === item.id);
                 if (index !== -1) card.items.splice(index, 1);
+            }
+        },
+        saveToLocalStorage() {
+            const data = {
+                col1: this.col1,
+                col2: this.col2,
+                col3: this.col3,
+                nextId: this.nextId
+            };
+            localStorage.setItem('notes-app-data', JSON.stringify(data));
+        },
+        loadFromLocalStorage() {
+            const saved = localStorage.getItem('notes-app-data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                this.col1 = data.col1 || [];
+                this.col2 = data.col2 || [];
+                this.col3 = data.col3 || [];
+                this.nextId = data.nextId || 1;
             }
         }
     }
