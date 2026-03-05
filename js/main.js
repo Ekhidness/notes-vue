@@ -8,6 +8,13 @@ new Vue({
         maxCol1: 3,
         maxCol2: 5
     },
+    computed: {
+        isCol1Blocked() {
+            return this.col2.length === this.maxCol2 && this.col1.some(card =>
+                this.getCompletionPercentage(card) > 50 && this.getCompletionPercentage(card) < 100
+            );
+        }
+    },
     methods: {
         getCompletionPercentage(card) {
             if (!card.items.length) return 0;
@@ -21,6 +28,18 @@ new Vue({
                 this[toCol].push(card);
             }
         },
+        processQueueFromCol1() {
+            const candidates = this.col1.filter(card =>
+                this.getCompletionPercentage(card) > 50 && this.getCompletionPercentage(card) < 100
+            );
+            for (let card of candidates) {
+                if (this.col2.length < this.maxCol2) {
+                    this.moveCard(card, 'col1', 'col2');
+                } else {
+                    break;
+                }
+            }
+        },
         onItemToggle(card) {
             const percentage = this.getCompletionPercentage(card);
 
@@ -31,6 +50,7 @@ new Vue({
             if (percentage === 100) {
                 if (currentCol === 'col1' || currentCol === 'col2') {
                     this.moveCard(card, currentCol, 'col3');
+                    if (currentCol === 'col2') this.processQueueFromCol1();
                 }
             } else if (percentage > 50 && currentCol === 'col1') {
                 if (this.col2.length < this.maxCol2) {
