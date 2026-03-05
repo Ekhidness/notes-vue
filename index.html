@@ -20,17 +20,17 @@
                     <input v-model="card.title" placeholder="Заголовок">
                     <div class="items">
                         <div v-for="item in card.items" :key="item.id" class="item">
+                            <input type="checkbox" v-model="item.completed" @change="onItemToggle(card)">
                             <input v-model="item.text" placeholder="Пункт">
                             <button @click="removeItem(card, item)" v-if="card.items.length > 3">-</button>
                         </div>
                     </div>
                     <div class="item-controls" v-if="card.items.length < 5">
-                        <button @click="addItem(card)">Добавить пункт</button>
+                        <button @click="addItem(card)">+ пункт</button>
                     </div>
                 </div>
             </div>
         </div>
-
 
         <div class="column">
             <h2>В процессе</h2>
@@ -39,6 +39,7 @@
                     <input v-model="card.title" placeholder="Заголовок">
                     <div class="items">
                         <div v-for="item in card.items" :key="item.id" class="item">
+                            <input type="checkbox" v-model="item.completed" @change="onItemToggle(card)">
                             <input v-model="item.text" placeholder="Пункт">
                         </div>
                     </div>
@@ -53,6 +54,7 @@
                     <input v-model="card.title" placeholder="Заголовок">
                     <div class="items">
                         <div v-for="item in card.items" :key="item.id" class="item">
+                            <input type="checkbox" v-model="item.completed" @change="onItemToggle(card)">
                             <input v-model="item.text" placeholder="Пункт">
                         </div>
                     </div>
