@@ -192,36 +192,39 @@ Vue.component("column", {
 new Vue({
   el: "#app",
   template: `
-        <div class="columns">
-            <column
-                title="Новое"
-                :cards="col1"
-                :max-cards="maxCol1"
-                :is-blocked="isCol1Blocked"
-                :disabled-items="disabledItems"
-                column-type="col1"
-                @add-card="addCard"
-                @item-toggle="onItemToggle"
-                @add-item="addItem"
-                @remove-item="removeItem"
-            />
+        <div>
+            <h1>Заметочки</h1>
+            <div class="columns">
+                <column
+                    title="Новое"
+                    :cards="col1"
+                    :max-cards="maxCol1"
+                    :is-blocked="isCol1Blocked"
+                    :disabled-items="disabledItems"
+                    column-type="col1"
+                    @add-card="addCard"
+                    @item-toggle="onItemToggle"
+                    @add-item="addItem"
+                    @remove-item="removeItem"
+                />
 
-            <column
-                title="В процессе"
-                :cards="col2"
-                :max-cards="maxCol2"
-                column-type="col2"
-                :readonly-text="true"
-                :disabled-items="disabledItems"
-                @item-toggle="onItemToggle"
-            />
+                <column
+                    title="В процессе"
+                    :cards="col2"
+                    :max-cards="maxCol2"
+                    column-type="col2"
+                    :readonly-text="true"
+                    :disabled-items="disabledItems"
+                    @item-toggle="onItemToggle"
+                />
 
-            <column
-                title="Завершено"
-                :cards="col3"
-                column-type="col3"
-                :completed="true"
-            />
+                <column
+                    title="Завершено"
+                    :cards="col3"
+                    column-type="col3"
+                    :completed="true"
+                />
+            </div>
         </div>
     `,
   data: {
@@ -281,6 +284,8 @@ new Vue({
       }
     },
     onItemToggle(item) {
+      if (this.disabledItems.includes(item.id)) return;
+
       this.disabledItems.push(item.id);
 
       let card = null;
@@ -303,7 +308,11 @@ new Vue({
         }
       }
 
-      if (!card) return;
+      if (!card) {
+        const index = this.disabledItems.indexOf(item.id);
+        if (index !== -1) this.disabledItems.splice(index, 1);
+        return;
+      }
 
       const percentage = this.getCompletionPercentage(card);
 
