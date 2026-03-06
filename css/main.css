@@ -1,50 +1,54 @@
 body {
-    font-family: sans-serif;
-    margin: 20px;
+  font-family: sans-serif;
+  margin: 20px;
 }
 
 .columns {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
 }
 
 .column {
-    flex: 1;
-    background: #eee;
-    padding: 10px;
+  flex: 1;
+  background: #eee;
+  padding: 10px;
 }
 
 .card {
-    background: #fff;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
+  background: #fff;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
 }
 
 .item {
-    display: flex;
-    gap: 5px;
-    margin-bottom: 5px;
+  display: flex;
+  gap: 5px;
+  margin-bottom: 5px;
 }
 
 .item input[type="text"] {
-    flex: 1;
+  flex: 1;
 }
 
 .item-controls {
-    margin-top: 5px;
+  margin-top: 5px;
 }
 
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 button:disabled {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 h2 {
-    text-align: center;
-    font-size: 800;
+  text-align: center;
+  font-size: 800;
+}
+
+.card.completed {
+  background-color: palegreen;
 }
