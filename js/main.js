@@ -13,7 +13,7 @@ Vue.component("card-item", {
                 type="checkbox"
                 v-model="item.completed"
                 @change="$emit('item-toggle', item)"
-                :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3'"
+                :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3' || !canToggle"
             >
             <input
                 v-model="item.text"
@@ -27,6 +27,17 @@ Vue.component("card-item", {
             >-</button>
         </div>
     `,
+  computed: {
+    canToggle() {
+      if (this.item.completed) {
+        return false;
+      }
+      if (!this.item.text || this.item.text.trim() === "") {
+        return false;
+      }
+      return true;
+    },
+  },
 });
 
 Vue.component("card-items", {
