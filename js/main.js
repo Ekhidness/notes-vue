@@ -13,7 +13,7 @@ Vue.component("card-item", {
                 type="checkbox"
                 v-model="item.completed"
                 @change="$emit('item-toggle', item)"
-                :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3' || !canToggle"
+                :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3'"
             >
             <input
                 v-model="item.text"
@@ -27,17 +27,6 @@ Vue.component("card-item", {
             >-</button>
         </div>
     `,
-  computed: {
-    canToggle() {
-      if (this.item.completed) {
-        return false;
-      }
-      if (!this.item.text || this.item.text.trim() === "") {
-        return false;
-      }
-      return true;
-    },
-  },
 });
 
 Vue.component("card-items", {
@@ -75,7 +64,7 @@ Vue.component("card-controls", {
             <button
                 @click="$emit('add-item')"
                 v-if="itemsLength < 5"
-            >Добавить пункт</button>
+            >+ пункт</button>
         </div>
     `,
 });
@@ -100,14 +89,37 @@ Vue.component("card", {
     "completed",
     "isBlocked",
     "disabledItems",
+    "preview",
+    "column",
   ],
   components: {
     "card-header": Vue.options.components["card-header"],
     "card-items": Vue.options.components["card-items"],
     "card-controls": Vue.options.components["card-controls"],
   },
+  computed: {
+    status() {
+      if (this.card.completedDate) return "Выполнена";
+      if (this.column === "col2") return "В процессе";
+      return "Новая";
+    },
+  },
   template: `
-        <div :class="['card', { completed: completed }]">
+        <div v-if="preview" class="card preview">
+            <div class="card-header">
+                <span class="card-date">Создано: {{ card.createdDate }}</span>
+                <span v-if="card.editedDate" class="edited-date">(ред. {{ card.editedDate }})</span>
+            </div>
+            <h3>{{ card.title }}</h3>
+            <ul class="preview-items">
+                <li v-for="item in card.items" :key="item.id" :class="{ completed: item.completed }">
+                    <span v-if="item.completed">✓</span> {{ item.text }}
+                </li>
+            </ul>
+            <div v-if="card.completedDate" class="completed-date">Завершена: {{ card.completedDate }}</div>
+            <div class="card-status">Статус: {{ status }}</div>
+        </div>
+        <div v-else :class="['card', { completed: completed }]">
             <template v-if="completed">
                 <h3>{{ card.title }}</h3>
                 <ul>
@@ -152,7 +164,8 @@ Vue.component("add-button", {
         <button
             @click="$emit('click')"
             :disabled="disabled"
-        >Добавить карточку</button>
+            class="add-card-btn"
+        >+ Добавить карточку</button>
     `,
 });
 
@@ -173,7 +186,7 @@ Vue.component("column", {
   },
   template: `
         <div class="column">
-            <h2>{{ title }}</h2>
+            <h2>{{ title }} <span v-if="maxCards">(≤{{ maxCards }})</span></h2>
 
             <add-button
                 v-if="columnType === 'col1'"
@@ -204,7 +217,32 @@ new Vue({
   el: "#app",
   template: `
         <div>
-            <h1>Заметочки</h1>
+            <h1>🐱 Заметочки</h1>
+
+            <div class="search-section">
+                <input
+                    type="text"
+                    v-model="searchQuery"
+                    placeholder="Поиск по названиям..."
+                    class="search-input"
+                />
+                <div v-if="searchQuery && filteredCards.length" class="search-results">
+                    <h3>Результаты поиска ({{ filteredCards.length }})</h3>
+                    <div class="results-grid">
+                        <card
+                            v-for="item in filteredCards"
+                            :key="item.card.id"
+                            :card="item.card"
+                            :column="item.col"
+                            :preview="true"
+                        />
+                    </div>
+                </div>
+                <div v-else-if="searchQuery && !filteredCards.length" class="no-results">
+                    Ничего не найдено
+                </div>
+            </div>
+
             <div class="columns">
                 <column
                     title="Новое"
@@ -246,6 +284,7 @@ new Vue({
     maxCol1: 3,
     maxCol2: 5,
     disabledItems: [],
+    searchQuery: "",
   },
   computed: {
     isCol1Blocked() {
@@ -256,6 +295,18 @@ new Vue({
             this.getCompletionPercentage(card) > 50 &&
             this.getCompletionPercentage(card) < 100,
         )
+      );
+    },
+    filteredCards() {
+      if (!this.searchQuery) return [];
+      const query = this.searchQuery.toLowerCase();
+      const all = [
+        ...this.col1.map((card) => ({ card, col: "col1" })),
+        ...this.col2.map((card) => ({ card, col: "col2" })),
+        ...this.col3.map((card) => ({ card, col: "col3" })),
+      ];
+      return all.filter((item) =>
+        item.card.title.toLowerCase().includes(query),
       );
     },
   },
@@ -338,6 +389,11 @@ new Vue({
           this.moveCard(card, "col1", "col2");
         }
       }
+
+      setTimeout(() => {
+        const index = this.disabledItems.indexOf(item.id);
+        if (index !== -1) this.disabledItems.splice(index, 1);
+      }, 300);
     },
     addCard() {
       if (this.col1.length >= this.maxCol1) return;
@@ -349,6 +405,8 @@ new Vue({
           { id: this.nextId++, text: "", completed: false },
           { id: this.nextId++, text: "", completed: false },
         ],
+        createdDate: new Date().toLocaleString(),
+        editedDate: null,
         completedDate: null,
       };
       this.col1.push(newCard);
