@@ -20,9 +20,7 @@ Vue.component("card-item", {
   ],
   components: { "sub-item": Vue.options.components["sub-item"] },
   data() {
-    return {
-      // для реактивности
-    };
+    return {};
   },
   computed: {
     hasSubs() {
@@ -87,7 +85,7 @@ Vue.component("card-item", {
         >
         <button
             @click="addSubItem"
-            v-if="!readonlyText && !isBlocked && (!item.subitems || item.subitems.length < 7)"
+            v-if="!readonlyText && !isBlocked && (!item.subitems || item.subitems.length < 7) && columnType === 'col1'"
             title="Добавить подпункт"
         >+под</button>
         <button
@@ -100,14 +98,13 @@ Vue.component("card-item", {
             v-for="sub in item.subitems"
             :key="sub.id"
             :sub="sub"
-            :readonly="readonlyText"
-            :is-blocked="isBlocked"
+            :readonly="readonlyText || isBlocked"
             @change="onSubChange"
             @remove="removeSubItem(sub)"
         />
       </div>
     </div>
-    `,
+  `,
 });
 
 Vue.component("card-items", {
@@ -303,7 +300,7 @@ new Vue({
   el: "#app",
   template: `
         <div>
-            <h1>🐱 Заметочки</h1>
+            <h1>Заметочки</h1>
 
             <div class="search-section">
                 <input

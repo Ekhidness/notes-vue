@@ -263,3 +263,55 @@ li {
   color: #666;
   padding: 20px;
 }
+
+.sub-items {
+  margin-left: 30px;
+  margin-top: 5px;
+  border-left: 2px dashed #ccc;
+  padding-left: 10px;
+}
+
+.sub-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.sub-item input[type="text"] {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.sub-item button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.preview-subs {
+  list-style: none;
+  padding-left: 20px;
+  margin-top: 4px;
+}
+
+.preview-subs li {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.preview-subs li.completed {
+  text-decoration: line-through;
+  color: #888;
+}
