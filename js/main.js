@@ -75,7 +75,7 @@ Vue.component("card-controls", {
             <button
                 @click="$emit('add-item')"
                 v-if="itemsLength < 5"
-            >+ пункт</button>
+            >Добавить пункт</button>
         </div>
     `,
 });
@@ -173,7 +173,7 @@ Vue.component("column", {
   },
   template: `
         <div class="column">
-            <h2>{{ title }} <span v-if="maxCards">(≤{{ maxCards }})</span></h2>
+            <h2>{{ title }}</h2>
 
             <add-button
                 v-if="columnType === 'col1'"
@@ -338,11 +338,6 @@ new Vue({
           this.moveCard(card, "col1", "col2");
         }
       }
-
-      setTimeout(() => {
-        const index = this.disabledItems.indexOf(item.id);
-        if (index !== -1) this.disabledItems.splice(index, 1);
-      }, 300);
     },
     addCard() {
       if (this.col1.length >= this.maxCol1) return;
