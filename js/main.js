@@ -1,3 +1,14 @@
+Vue.component("sub-item", {
+  props: ["sub", "readonly", "isBlocked"],
+  template: `
+    <div class="sub-item">
+      <input type="checkbox" v-model="sub.completed" @change="$emit('change')" :disabled="readonly || isBlocked">
+      <input type="text" v-model="sub.text" :readonly="readonly" :disabled="isBlocked" placeholder="подпункт">
+      <button @click="$emit('remove')" v-if="!readonly && !isBlocked">-</button>
+    </div>
+  `,
+});
+
 Vue.component("card-item", {
   props: [
     "item",
@@ -7,25 +18,95 @@ Vue.component("card-item", {
     "isBlocked",
     "disabledItems",
   ],
+  components: { "sub-item": Vue.options.components["sub-item"] },
+  data() {
+    return {
+      // для реактивности
+    };
+  },
+  computed: {
+    hasSubs() {
+      return this.item.subitems && this.item.subitems.length > 0;
+    },
+    allSubDone() {
+      return this.hasSubs && this.item.subitems.every((s) => s.completed);
+    },
+  },
+  methods: {
+    addSubItem() {
+      if (!this.item.subitems) this.$set(this.item, "subitems", []);
+      if (this.item.subitems.length < 7) {
+        this.item.subitems.push({
+          id: Date.now() + Math.random(),
+          text: "",
+          completed: false,
+        });
+      }
+    },
+    removeSubItem(sub) {
+      const idx = this.item.subitems.indexOf(sub);
+      if (idx !== -1) this.item.subitems.splice(idx, 1);
+      this.updateParent();
+    },
+    onSubChange() {
+      this.updateParent();
+    },
+    updateParent() {
+      const newVal = this.allSubDone;
+      if (this.item.completed !== newVal) {
+        this.item.completed = newVal;
+        this.$emit("item-toggle", this.item);
+      }
+    },
+    onParentChange(e) {
+      if (this.hasSubs) {
+        alert("Сначала выполните все подпункты");
+        this.$nextTick(() => {
+          e.target.checked = this.item.completed;
+        });
+        return;
+      }
+      this.item.completed = e.target.checked;
+      this.$emit("item-toggle", this.item);
+    },
+  },
   template: `
-        <div class="item">
-            <input
-                type="checkbox"
-                v-model="item.completed"
-                @change="$emit('item-toggle', item)"
-                :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3'"
-            >
-            <input
-                v-model="item.text"
-                :readonly="readonlyText || columnType === 'col3'"
-                :disabled="isBlocked || columnType === 'col3'"
-                placeholder="Пункт"
-            >
-            <button
-                v-if="!readonlyText && card.items.length > 3 && !isBlocked && columnType === 'col1'"
-                @click="$emit('remove-item', item)"
-            >-</button>
-        </div>
+    <div class="item-wrapper">
+      <div class="item">
+        <input
+            type="checkbox"
+            :checked="item.completed"
+            @change="onParentChange"
+            :disabled="isBlocked || disabledItems.includes(item.id) || columnType === 'col3'"
+        >
+        <input
+            v-model="item.text"
+            :readonly="readonlyText || columnType === 'col3'"
+            :disabled="isBlocked || columnType === 'col3'"
+            placeholder="Пункт"
+        >
+        <button
+            @click="addSubItem"
+            v-if="!readonlyText && !isBlocked && (!item.subitems || item.subitems.length < 7)"
+            title="Добавить подпункт"
+        >+под</button>
+        <button
+            v-if="!readonlyText && card.items.length > 3 && !isBlocked && columnType === 'col1'"
+            @click="$emit('remove-item', item)"
+        >-</button>
+      </div>
+      <div v-if="hasSubs" class="sub-items">
+        <sub-item
+            v-for="sub in item.subitems"
+            :key="sub.id"
+            :sub="sub"
+            :readonly="readonlyText"
+            :is-blocked="isBlocked"
+            @change="onSubChange"
+            @remove="removeSubItem(sub)"
+        />
+      </div>
+    </div>
     `,
 });
 
@@ -114,6 +195,11 @@ Vue.component("card", {
             <ul class="preview-items">
                 <li v-for="item in card.items" :key="item.id" :class="{ completed: item.completed }">
                     <span v-if="item.completed">✓</span> {{ item.text }}
+                    <ul v-if="item.subitems && item.subitems.length" class="preview-subs">
+                        <li v-for="sub in item.subitems" :key="sub.id" :class="{ completed: sub.completed }">
+                            <span v-if="sub.completed">✓</span> {{ sub.text }}
+                        </li>
+                    </ul>
                 </li>
             </ul>
             <div v-if="card.completedDate" class="completed-date">Завершена: {{ card.completedDate }}</div>
@@ -186,7 +272,7 @@ Vue.component("column", {
   },
   template: `
         <div class="column">
-            <h2>{{ title }} <span v-if="maxCards">(≤{{ maxCards }})</span></h2>
+            <h2>{{ title }}</h2>
 
             <add-button
                 v-if="columnType === 'col1'"
@@ -401,9 +487,9 @@ new Vue({
         id: this.nextId++,
         title: "Новая карточка",
         items: [
-          { id: this.nextId++, text: "", completed: false },
-          { id: this.nextId++, text: "", completed: false },
-          { id: this.nextId++, text: "", completed: false },
+          { id: this.nextId++, text: "", completed: false, subitems: [] },
+          { id: this.nextId++, text: "", completed: false, subitems: [] },
+          { id: this.nextId++, text: "", completed: false, subitems: [] },
         ],
         createdDate: new Date().toLocaleString(),
         editedDate: null,
@@ -413,7 +499,12 @@ new Vue({
     },
     addItem(card) {
       if (card.items.length < 5) {
-        card.items.push({ id: this.nextId++, text: "", completed: false });
+        card.items.push({
+          id: this.nextId++,
+          text: "",
+          completed: false,
+          subitems: [],
+        });
       }
     },
     removeItem(card, item) {
