@@ -87,7 +87,7 @@ Vue.component("card-item", {
             @click="addSubItem"
             v-if="!readonlyText && !isBlocked && (!item.subitems || item.subitems.length < 7) && columnType === 'col1'"
             title="Добавить подпункт"
-        >+под</button>
+        >+подпункт</button>
         <button
             v-if="!readonlyText && card.items.length > 3 && !isBlocked && columnType === 'col1'"
             @click="$emit('remove-item', item)"
